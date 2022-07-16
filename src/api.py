@@ -27,14 +27,13 @@ app = FastAPI()
 api_func = APIProcess()
 
 
+templates = Jinja2Templates(directory="templates")
 
-# templates = Jinja2Templates(directory="templates")
 
-
-# @app.get("/", response_class=HTMLResponse)
-# def index(request: Request):
-#     context = {"request": request}
-#     return templates.TemplateResponse("index.html", context)
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request):
+    context = {"request": request}
+    return templates.TemplateResponse("index.html", context)
 
 @app.get("/api/v1/data")
 def get_data():
