@@ -1,6 +1,6 @@
 import logging
 
-from parser.analyser import RawParser, DownloadParser, TMDBMatcher
+from parser.analyser import RawParser, DownloadParser, TMDBParser
 from conf import settings
 
 logger = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ class TitleParser:
     def __init__(self):
         self._raw_parser = RawParser()
         self._download_parser = DownloadParser()
-        self._tmdb_parser = TMDBMatcher()
+        self._tmdb_parser = TMDBParser()
 
     def raw_parser(self, raw: str):
         return self._raw_parser.analyse(raw)

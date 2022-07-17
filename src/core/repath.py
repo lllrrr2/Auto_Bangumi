@@ -1,28 +1,12 @@
 import logging
 import re
-from dataclasses import dataclass
 from pathlib import PurePath, PureWindowsPath
 
 from core import DownloadClient
 from conf import settings
 from utils import json_config
-
+from dataformat import RuleInfo,RePathInfo
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class RuleInfo:
-    rule_name: str
-    contain: str
-    season: int
-    folder_name: str
-    new_path: str
-
-
-@dataclass
-class RePathInfo:
-    path: str
-    hashes: list
 
 
 class RePath:

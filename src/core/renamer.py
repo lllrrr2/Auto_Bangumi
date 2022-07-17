@@ -82,6 +82,26 @@ class Renamer:
             self.client.move_torrent(torrent_hash, new_path)
 
 
+class RenamerCollection:
+    def __init__(self):
+        self.client = DownloadClient()
+        self._renamer = TitleParser()
+
+    def get_collection_info(self):
+        recent_info = self.client.get_collection_info()
+        torrent_count = len(recent_info)
+        return recent_info, torrent_count
+
+    def get_titles_in_collection(self):
+        recent_info = self.client.get_collection_info()
+        titles = []
+        for info in recent_info:
+            name = info.name
+            path_name, _, _, _, _ = self.split_path(info.content_path)
+            titles.append(path_name)
+        return titles
+
+
 if __name__ == "__main__":
     from conf.const_dev import DEV_SETTINGS
     settings.init(DEV_SETTINGS)

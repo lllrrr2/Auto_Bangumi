@@ -1,8 +1,7 @@
 import logging
 import re
-from dataclasses import dataclass
 
-# from parser.episode import Episode
+from dataformat import Episode
 
 logger = logging.getLogger(__name__)
 
@@ -26,20 +25,6 @@ CHINESE_NUMBER_MAP = {
     "九": 9,
     "十": 10,
 }
-
-
-@dataclass
-class Episode:
-    title_en: str
-    title_zh: str
-    title_jp: str
-    season: int
-    season_raw: str
-    episode: int
-    sub: str
-    group: str
-    resolution: str
-    source: str
 
 
 class RawParser:

@@ -21,4 +21,4 @@ coverage.xml
 
 src/tests
 src/conf/const_dev.py
-config/bangumi.json/config/bangumi.json
+config/config_dev.json

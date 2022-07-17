@@ -23,6 +23,7 @@ DEFAULT_SETTINGS = {
     "title_language": "zh",
     "tmdb_api": "32b19d6a05b512190a056fa4e747cbbc",
     "enable_tmdb": False,
+    "https_proxy": None,
     "socks": None,
     "enable_rss_collector": True,
     "enable_rename": True,

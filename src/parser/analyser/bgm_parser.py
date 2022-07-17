@@ -3,9 +3,9 @@ import time
 
 from network import RequestContent
 from conf import settings
+from dataformat import BgmInfo
 
-
-class BgmAPI:
+class BangumiParser:
     def __init__(self):
         self.search_url = lambda e: \
             f"https://api.bgm.tv/search/subject/{e}?type=2"

@@ -163,7 +163,9 @@ cython_debug/
 
 # Custom
 /src/conf/const_dev.py
-/config
+/config/config_dev.json
+/config/log.txt
+/config/bangumi.json
 /src/tester.py
 
 /src/parser/analyser/tmdb_parser.py

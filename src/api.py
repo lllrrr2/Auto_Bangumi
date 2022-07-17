@@ -71,6 +71,14 @@ async def subscribe(link: RssLink):
     return api_func.add_subscribe(link.rss_link)
 
 
+class ChangeRule(BaseModel):
+    official_title: str
+    must_contain: str
+    not_contain: str
+    season: int
+    on_air_year: int
+
+
 class AddRule(BaseModel):
     title: str
     season: int

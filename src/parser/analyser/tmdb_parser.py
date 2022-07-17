@@ -4,19 +4,10 @@ from dataclasses import dataclass
 
 from network import RequestContent
 from conf import settings
+from dataformat import TMDBInfo
 
 
-@dataclass
-class TMDBInfo:
-    id: int
-    title_jp: str
-    title_zh: str
-    season: dict
-    last_season: int
-    year_number: int
-
-
-class TMDBMatcher:
+class TMDBParser:
     def __init__(self):
         self.search_url = lambda e: \
             f"https://api.themoviedb.org/3/search/tv?api_key={settings.tmdb_api}&page=1&query={e}&include_adult=false"
@@ -75,5 +66,5 @@ class TMDBMatcher:
 
 if __name__ == "__main__":
     test = "辉夜大小姐"
-    info = TMDBMatcher().tmdb_search(test)
+    info = TMDBParser().tmdb_search(test)
     print(f"{info.title_zh}({info.year_number})")
