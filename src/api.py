@@ -1,10 +1,9 @@
-import re
-
 import uvicorn
 from uvicorn.config import LOGGING_CONFIG
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
 
@@ -25,6 +24,20 @@ else:
     settings.init()
 app = FastAPI()
 api_func = APIProcess()
+
+origins = [
+    "http://localhost",
+    "http://localhost:7892",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 templates = Jinja2Templates(directory="templates")
