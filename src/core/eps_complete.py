@@ -34,7 +34,7 @@ class FullSeasonGet:
                 "url": torrent.torrent_link,
                 "save_path": os.path.join(
                         settings.download_path,
-                        data["official_title"],
+                        data.get("official_title"),
                         f"Season {data['season']}")
             }
             downloads.append(download_info)
@@ -64,17 +64,19 @@ class FullSeasonGet:
 
 
 if __name__ == "__main__":
+    from conf.const_dev import DEV_SETTINGS
+    settings.init(DEV_SETTINGS)
     a = FullSeasonGet()
     data = {
-            "official_title": "指名！",
-            "title_raw": "CUE!",
+            "official_title": "Engage Kiss",
+            "title_raw": "Engage Kiss",
             "season": 1,
             "season_raw": "",
-            "group": "喵萌Production",
+            "group": "Lilith-Raws",
             "dpi": "1080p",
-            "source": None,
-            "subtitle": "简日双语",
+            "source": "Baha",
+            "subtitle": "CHT",
             "added": True,
             "eps_collect": True
         }
-    print(a.init_eps_complete_search_str(data))
+    a.download_eps(data, DownloadClient())

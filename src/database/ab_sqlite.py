@@ -1,13 +1,16 @@
 from dataset import MainData
 from conf import settings
 
+import logging
 import sqlite3
+
+logger = logging.getLogger(__name__)
 
 
 class DataBase:
     def __init__(self):
-        self.conn = sqlite3.connect(settings.db_path)
-        self.cursor = self.conn.cursor()
+        self.conn = None
+        self.cursor = None
 
     def create_db(self):
         self.cursor.execute("""
@@ -24,52 +27,149 @@ class DataBase:
                 source TEXT,
                 contain TEXT,
                 not_contain TEXT,
-                added BOOLEAN,
-                eps_collect BOOLEAN,
+                added INTEGER,
+                eps_collect INTEGER,
                 ep_offset INTEGER  
             );
         """)
         self.conn.commit()
         self.conn.close()
 
-    @staticmethod
-    def load_db() -> [MainData]:
-        conn = sqlite3.connect(settings.db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM main_data")
-        data = cursor.fetchall()
-        conn.close()
-        return data
+    def connect_db(self):
+        self.conn = sqlite3.connect(settings.db_path)
+        self.cursor = self.conn.cursor()
 
-    @staticmethod
-    def save_db(data: [MainData]):
-        conn = sqlite3.connect(settings.db_path)
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS main_data (id TEXT, title TEXT, season TEXT, group TEXT, dpi TEXT, eps_complete TEXT, added TEXT)")
-        for d in data:
-            cursor.execute("INSERT INTO main_data VALUES (?, ?, ?, ?, ?, ?, ?)", (d.id, d.title, d.season, d.group, d.dpi, d.eps_complete, d.added))
-        conn.commit()
-        conn.close()
+    def insert_data(self, data: MainData):
+        self.connect_db()
+        self.cursor.execute("""
+            INSERT INTO BANGUMI (
+                title_zh,
+                title_jp,
+                title_en,
+                year,
+                season,
+                cover_url,
+                sub_group,
+                resolution,
+                source,
+                contain,
+                not_contain,
+                added,
+                eps_collect,
+                ep_offset
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data.title_zh,
+            data.title_jp,
+            data.title_en,
+            data.year,
+            data.season,
+            data.cover_url,
+            data.sub_group,
+            data.resolution,
+            data.source,
+            data.contain,
+            data.not_contain,
+            1 if data.added else 0,
+            1 if data.eps_collect else 0,
+            data.ep_offset
+        ))
 
-    @staticmethod
-    def search_title(title) -> MainData:
-        conn = sqlite3.connect(settings.db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM main_data WHERE title = ?", (title,))
-        data = cursor.fetchone()
-        conn.close()
-        return MainData(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
+    def insert_datas(self, datas: list):
+        self.connect_db()
+        for data in datas:
+            self.insert_data(data)
 
-    @staticmethod
-    def search_id(uuid):
-        conn = sqlite3.connect(settings.db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM main_data WHERE id = ?", (uuid,))
-        data = cursor.fetchone()
-        conn.close()
-        return MainData(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
+    def get_all_datas(self) -> [MainData]:
+        self.connect_db()
+        self.cursor.execute("""
+            SELECT * FROM BANGUMI
+        """)
+        datas = self.cursor.fetchall()
+        self.conn.close()
+        data_list = []
+        for data in datas:
+            data_list.append(MainData(
+                id=data[0],
+                title_zh=data[1],
+                title_jp=data[2],
+                title_en=data[3],
+                year=data[4],
+                season=data[5],
+                cover_url=data[6],
+                sub_group=data[7],
+                resolution=data[8],
+                source=data[9],
+                contain=data[10],
+                not_contain=data[11],
+                added=data[12],
+                eps_collect=data[13],
+                ep_offset=data[14]
+            ))
+        return data_list
+
+    def update_data(self, data: MainData):
+        self.connect_db()
+        self.cursor.execute("""
+            UPDATE BANGUMI SET
+                title_zh = ?,
+                title_jp = ?,
+                title_en = ?,
+                year = ?,
+                season = ?,
+                cover_url = ?,
+                sub_group = ?,
+                resolution = ?,
+                source = ?,
+                contain = ?,
+                not_contain = ?,
+                added = ?,
+                eps_collect = ?,
+                ep_offset = ?
+            WHERE id = ?
+        """, (
+            data.title_zh,
+            data.title_jp,
+            data.title_en,
+            data.year,
+            data.season,
+            data.cover_url,
+            data.sub_group,
+            data.resolution,
+            data.source,
+            data.contain,
+            data.not_contain,
+            1 if data.added else 0,
+            1 if data.eps_collect else 0,
+            data.ep_offset,
+            data.id
+        ))
+        logger.info(f"Update column: {data.id} success.")
+
+    def delete_column(self, data: int or MainData):
+        self.connect_db()
+        id = data if data is int else data.id
+        self.cursor.execute("""
+               DELETE FROM BANGUMI WHERE id = ?
+           """, (id,))
+        logger.info(f"Delete column: {id} success.")
+
+    def select_contain_datas(self) -> list:
+        self.connect_db()
+        db_list = self.cursor.execute("""SELECT contain FROM BANGUMI""")
+        return [data[0] for data in db_list]
+
+    def commit(self):
+        self.conn.commit()
+        self.conn.close()
 
 
 if __name__ == '__main__':
     db = DataBase()
-    db.create_db()
+    # db.delete_column(1)
+    # data = MainData(None, "测试", "测试", "Test", 2020, 1, "Lilith", "测试", "测试", "测试", "测试", "测试", True, False, 0)
+    # for data in db.get_all_datas():
+    #     print(data.title_zh)
+    # db.commit()
+
+    print(db.select_contain_datas())

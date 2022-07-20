@@ -4,8 +4,8 @@ from dataclasses import dataclass
 # main data
 @dataclass
 class MainData:
+    id: int or None
     # main data
-    uuid: str
     title_zh: str or None
     title_jp: str or None
     title_en: str or None
