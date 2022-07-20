@@ -2,6 +2,7 @@ import logging
 
 from parser.analyser import RawParser, DownloadParser
 from parser.internet_parser import TMDBParser, BangumiParser
+from dataset import MainData
 from conf import settings
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class TitleParser:
         season = tmdb_info.last_season
         return official_title, season
 
-    def return_dict(self, raw: str):
+    def return_dict(self, raw: str) -> MainData:
         try:
             episode = self.raw_parser(raw)
             title_search = episode.title_zh if episode.title_zh != "" else episode.title_en
@@ -42,18 +43,24 @@ class TitleParser:
             else:
                 official_title = title_search
                 season = episode.season
-            data = {
-                "official_title": official_title,
-                "title_raw": episode.title_en,
-                "season": season if season is not None else episode.season,
-                "season_raw": episode.season_raw,
-                "group": episode.group,
-                "dpi": episode.resolution,
-                "source": episode.source,
-                "subtitle": episode.sub,
-                "added": False,
-                "eps_collect": True if settings.eps_complete and episode.ep_info.number > 1 else False,
-            }
+            # TODO TMDB引入
+            data = MainData(
+                None,
+                episode.title_zh,
+                episode.title_jp,
+                episode.title_en,
+                episode.year,
+                season,
+                "cover_url",
+                episode.group,
+                episode.resolution,
+                episode.source,
+                episode.contain,
+                settings.not_contain,
+                False,
+                True if settings.eps_complete and episode.episode > 1 else False,
+                0
+            )
             logger.debug(f"RAW:{raw} >> {episode.title_en}")
             return data
         except Exception as e:
