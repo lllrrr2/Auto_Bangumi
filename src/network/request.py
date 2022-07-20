@@ -7,7 +7,7 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from conf import settings
+from config import settings
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ import os.path
 from pathlib import PurePath, PureWindowsPath
 
 
-from conf import settings
+from config import settings
 from core import DownloadClient
 from parser import TitleParser
 
@@ -54,6 +54,7 @@ class Renamer:
     def run(self):
         recent_info, torrent_count = self.get_torrent_info()
         rename_count = 0
+        failed_hashes = []
         for info in recent_info:
             name = info.name
             torrent_hash = info.hash
@@ -66,11 +67,14 @@ class Renamer:
                     rename_count += 1
                 else:
                     continue
-            except:
+            except Exception as e:
+                logger.debug(e)
                 logger.warning(f"{path_name} rename failed")
+                failed_hashes.append(info.hash)
                 if settings.remove_bad_torrent:
                     self.client.delete_torrent(torrent_hash)
         self.print_result(torrent_count, rename_count)
+        return failed_hashes
 
     def set_folder(self):
         recent_info, _ = self.get_torrent_info()
@@ -82,28 +86,8 @@ class Renamer:
             self.client.move_torrent(torrent_hash, new_path)
 
 
-class RenamerCollection:
-    def __init__(self):
-        self.client = DownloadClient()
-        self._renamer = TitleParser()
-
-    def get_collection_info(self):
-        recent_info = self.client.get_collection_info()
-        torrent_count = len(recent_info)
-        return recent_info, torrent_count
-
-    def get_titles_in_collection(self):
-        recent_info = self.client.get_collection_info()
-        titles = []
-        for info in recent_info:
-            name = info.name
-            path_name, _, _, _, _ = self.split_path(info.content_path)
-            titles.append(path_name)
-        return titles
-
-
 if __name__ == "__main__":
-    from conf.const_dev import DEV_SETTINGS
+    from config.const_dev import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     client = DownloadClient()
     rename = Renamer(client)

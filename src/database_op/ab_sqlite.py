@@ -1,5 +1,5 @@
 from dataformat import MainData
-from conf import settings
+from config import settings
 
 import sqlite3
 

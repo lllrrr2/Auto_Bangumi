@@ -17,6 +17,8 @@ class MainData:
     # downloader info
     contain: str
     not_contain: str
+    added: bool
+    eps_collect: bool
     # rename info
     ep_offset: int
 

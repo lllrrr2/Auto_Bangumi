@@ -3,13 +3,13 @@ import re
 from pathlib import PurePath, PureWindowsPath
 
 from core import DownloadClient
-from conf import settings
+from config import settings
 from utils import json_config
 from dataformat import RuleInfo,RePathInfo
 logger = logging.getLogger(__name__)
 
 
-class RePath:
+class Repath:
     def __init__(self, download_client: DownloadClient):
         self._client = download_client
         self.re_season = re.compile(r"S\d{1,2}")
@@ -72,7 +72,7 @@ class RePath:
 
 
 if __name__ == '__main__':
-    from conf.const_dev import DEV_SETTINGS
+    from config.const_dev import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     client = DownloadClient()
     r = RePath(client)

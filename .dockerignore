@@ -20,5 +20,5 @@ coverage.xml
 .hypothesis
 
 src/tests
-src/conf/const_dev.py
-config/config_dev.json
+src/config/const_dev.py
+src/config/config_dev.json

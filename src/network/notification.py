@@ -1,6 +1,6 @@
 import requests
 
-from conf import settings
+from config import settings
 
 
 class PostNotification:

@@ -3,7 +3,7 @@ import time
 
 import requests
 
-from conf import settings
+from config import settings
 
 
 logger = logging.getLogger(__name__)

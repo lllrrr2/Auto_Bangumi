@@ -1,0 +1,29 @@
+{
+    "host_ip": "localhost:8080",
+    "sleep_time": 7200,
+    "times": 20,
+    "user_name": "admin",
+    "password": "adminadmin",
+    "download_path": "/downloads/Bangumi/",
+    "method": "pn",
+    "enable_group_tag": false,
+    "not_contain": [
+        "720",
+        "\\d+-\\d+"
+    ],
+    "debug_mode": false,
+    "remove_bad_torrent": false,
+    "dev_debug": false,
+    "eps_complete": false,
+    "webui_port": 7892,
+    "title_language": "zh",
+    "tmdb_api": "32b19d6a05b512190a056fa4e747cbbc",
+    "enable_tmdb": false,
+    "http_proxy": null,
+    "socks": null,
+    "enable_rss_collector": true,
+    "enable_rename": true,
+    "reset_folder": false,
+    "setting": false,
+    "data_path": "/data/data.db"
+}

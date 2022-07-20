@@ -3,7 +3,7 @@ import time
 from dataclasses import dataclass
 
 from network import RequestContent
-from conf import settings
+from config import settings
 from dataformat import TMDBInfo
 
 

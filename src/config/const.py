@@ -1,36 +1,4 @@
 # -*- encoding: utf-8 -*-
-
-DEFAULT_SETTINGS = {
-    "version": "2.5.11",
-    "data_version": 4.0,
-    "host_ip": "localhost:8080",
-    "sleep_time": 7200,
-    "times": 20,
-    "user_name": "admin",
-    "password": "adminadmin",
-    "download_path": "/downloads/Bangumi/",
-    "method": "pn",
-    "enable_group_tag": False,
-    "info_path": "/config/bangumi.json",
-    "not_contain": r"720|\d+-\d+",
-    "connect_retry_interval": 5,
-    "rule_name_re": r"\:|\/|\.",
-    "debug_mode": False,
-    "remove_bad_torrent": False,
-    "dev_debug": False,
-    "eps_complete": False,
-    "webui_port": 7892,
-    "title_language": "zh",
-    "tmdb_api": "32b19d6a05b512190a056fa4e747cbbc",
-    "enable_tmdb": False,
-    "https_proxy": None,
-    "socks": None,
-    "enable_rss_collector": True,
-    "enable_rename": True,
-    "reset_folder": False,
-    "log_path": "/config/log.txt",
-}
-
 ENV_TO_ATTR = {
     "AB_DOWNLOADER_HOST": "host_ip",
     "AB_INTERVAL_TIME": ("sleep_time", lambda e: float(e)),

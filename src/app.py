@@ -2,8 +2,8 @@ import os
 import time
 import logging
 
-from conf import settings, parse
-from conf.log import setup_logger
+from config import settings, parse
+from config.log import setup_logger
 from utils import json_config
 
 from core import RSSAnalyser, DownloadClient, Renamer, FullSeasonGet
@@ -85,8 +85,8 @@ def run():
     args = parse()
     if args.debug:
         try:
-            from conf.const_dev import DEV_SETTINGS
-            settings.init(DEV_SETTINGS)
+            from config import DEV_SETTINGS
+            settings.init(DEV_SETTINGS())
         except ModuleNotFoundError:
             logger.debug("Please copy `const_dev.py` to `const_dev.py` to use custom settings")
     else:

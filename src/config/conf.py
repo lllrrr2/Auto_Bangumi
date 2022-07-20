@@ -1,5 +1,14 @@
 import os
-from conf import const
+from config import const
+from utils import json_config
+
+
+def DEFAULT_SETTINGS():
+    return json_config.load("config.json")
+
+
+def DEV_SETTINGS():
+    return json_config.load("config_dev.json")
 
 
 class Settings(dict):
@@ -31,4 +40,4 @@ class Settings(dict):
         }
 
 
-settings = Settings(const.DEFAULT_SETTINGS)
+settings = Settings(DEFAULT_SETTINGS())

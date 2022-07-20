@@ -162,13 +162,12 @@ cython_debug/
 #.idea/
 
 # Custom
-/src/conf/const_dev.py
-/config/config_dev.json
-/config/log.txt
-/config/bangumi.json
+/src/config/const_dev.py
+/src/config/config_dev.json
 /src/tester.py
 
 /src/parser/analyser/tmdb_parser.py
 
 /src/run_debug.sh
 /src/debug_run.sh
+/src/__version__.py

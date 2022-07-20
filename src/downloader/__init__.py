@@ -1,4 +1,4 @@
-from conf import settings
+from config import settings
 
 
 def getClient():

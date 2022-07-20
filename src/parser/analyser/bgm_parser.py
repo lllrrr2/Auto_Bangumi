@@ -2,7 +2,7 @@ import re
 import time
 
 from network import RequestContent
-from conf import settings
+from config import settings
 from dataformat import BgmInfo
 
 class BangumiParser:

@@ -4,7 +4,7 @@ import time
 from aria2p import Client, ClientException, API
 
 
-from conf import settings
+from config import settings
 
 from downloader.exceptions import ConflictError
 
