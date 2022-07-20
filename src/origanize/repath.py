@@ -1,11 +1,10 @@
 import logging
 import re
-from pathlib import PurePath, PureWindowsPath
+from pathlib import PurePath
 
 from core import DownloadClient
-from config import settings
-from utils import json_config
-from dataformat import RuleInfo,RePathInfo
+from conf import settings
+from dataset import RuleInfo,RePathInfo
 logger = logging.getLogger(__name__)
 
 
@@ -72,7 +71,7 @@ class Repath:
 
 
 if __name__ == '__main__':
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     client = DownloadClient()
     r = RePath(client)

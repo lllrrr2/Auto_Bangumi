@@ -1,7 +1,7 @@
 from thefuzz import fuzz
 import logging
 from utils import json_config
-from config import settings
+from conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class FuzzMatch:
 
 
 if __name__ == "__main__":
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     f = FuzzMatch()
     name = "勇者、辞职不干了"

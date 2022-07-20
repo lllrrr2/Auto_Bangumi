@@ -5,7 +5,7 @@ import os
 from downloader import getClient
 from downloader.exceptions import ConflictError
 
-from config import settings
+from conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ class DownloadClient:
 
 
 if __name__ == "__main__":
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     put = DownloadClient()
     info = put.get_torrent_info()

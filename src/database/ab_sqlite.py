@@ -1,12 +1,36 @@
-from dataformat import MainData
-from config import settings
+from dataset import MainData
+from conf import settings
 
 import sqlite3
 
 
-class DataOprate:
+class DataBase:
     def __init__(self):
-        pass
+        self.conn = sqlite3.connect(settings.db_path)
+        self.cursor = self.conn.cursor()
+
+    def create_db(self):
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS BANGUMI (
+                id INTEGER PRIMARY KEY,
+                title_zh TEXT,
+                title_jp TEXT,
+                title_en TEXT,
+                year INTEGER,
+                season INTEGER,
+                cover_url TEXT,
+                sub_group TEXT,
+                resolution TEXT,
+                source TEXT,
+                contain TEXT,
+                not_contain TEXT,
+                added BOOLEAN,
+                eps_collect BOOLEAN,
+                ep_offset INTEGER  
+            );
+        """)
+        self.conn.commit()
+        self.conn.close()
 
     @staticmethod
     def load_db() -> [MainData]:
@@ -44,3 +68,8 @@ class DataOprate:
         data = cursor.fetchone()
         conn.close()
         return MainData(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
+
+
+if __name__ == '__main__':
+    db = DataBase()
+    db.create_db()

@@ -1,35 +1,33 @@
 import re
 import time
-from dataclasses import dataclass
 
 from network import RequestContent
-from config import settings
-from dataformat import TMDBInfo
+from conf import settings
+from dataset import TMDBInfo
+
+TMDB_API_URl = "https://api.themoviedb.org/3/"
+API_KEY = f"api_key={settings.tmdb_api}"
 
 
 class TMDBParser:
     def __init__(self):
-        self.search_url = lambda e: \
-            f"https://api.themoviedb.org/3/search/tv?api_key={settings.tmdb_api}&page=1&query={e}&include_adult=false"
-        self.info_url = lambda e: \
-            f"https://api.themoviedb.org/3/tv/{e}?api_key={settings.tmdb_api}&language=zh-CN"
         self._request = RequestContent()
 
+    @staticmethod
+    def gen_search_url(title) -> str:
+        return TMDB_API_URl+"search/tv?"+API_KEY+f"&page=1&query={title}&include_adult=false"
+
+    @staticmethod
+    def gen_info_url(id) -> str:
+        return TMDB_API_URl+f"tv/{id}?"+API_KEY+"&language=zh-CN"
+
     def is_animation(self, tv_id) -> bool:
-        url_info = self.info_url(tv_id)
+        url_info = self.gen_info_url(tv_id)
         type_id = self._request.get_json(url_info)["genres"]
         for type in type_id:
             if type.get("id") == 16:
                 return True
         return False
-
-    # def get_zh_title(self, id):
-    #     alt_title_url = self.alt_title_url(id)
-    #     titles = self._request.get_content(alt_title_url, content="json")
-    #     for title in titles:
-    #         if title["iso_3166_1"] == "CN":
-    #             return title["title"]
-    #     return None
 
     @staticmethod
     def get_season(seasons: list) -> int:
@@ -42,17 +40,17 @@ class TMDBParser:
                     return int(re.findall(r"\d", season.get("season"))[0])
 
     def tmdb_search(self, title) -> TMDBInfo:
-        url = self.search_url(title)
+        url = self.gen_search_url(title)
         contents = self._request.get_json(url).get("results")
         if contents.__len__() == 0:
-            url = self.search_url(title.replace(" ", ""))
+            url = self.gen_search_url(title.replace(" ", ""))
             contents = self._request.get_json(url).get("results")
         # 判断动画
         for content in contents:
             id = content["id"]
             if self.is_animation(id):
                 break
-        url_info = self.info_url(id)
+        url_info = self.gen_info_url(id)
         info_content = self._request.get_json(url_info)
         # 关闭链接
         self._request.close_session()

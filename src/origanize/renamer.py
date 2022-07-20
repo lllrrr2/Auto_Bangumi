@@ -5,7 +5,7 @@ import os.path
 from pathlib import PurePath, PureWindowsPath
 
 
-from config import settings
+from conf import settings
 from core import DownloadClient
 from parser import TitleParser
 
@@ -87,7 +87,7 @@ class Renamer:
 
 
 if __name__ == "__main__":
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     client = DownloadClient()
     rename = Renamer(client)

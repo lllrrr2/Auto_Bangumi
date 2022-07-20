@@ -2,7 +2,7 @@ import os.path
 import re
 import logging
 
-from config import settings
+from conf import settings
 from network import RequestContent
 from core import DownloadClient
 

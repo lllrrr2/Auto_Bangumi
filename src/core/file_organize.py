@@ -1,6 +1,7 @@
-from file_origanize import *
+from origanize import *
 from download_client import DownloadClient
-from config import settings
+from conf import settings
+
 
 class FileOrganize:
     def __init__(self, client: DownloadClient):

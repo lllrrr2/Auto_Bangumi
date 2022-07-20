@@ -6,7 +6,9 @@ from dataclasses import dataclass
 class MainData:
     # main data
     uuid: str
-    official_title: str
+    title_zh: str or None
+    title_jp: str or None
+    title_en: str or None
     year: int
     season: int
     cover_url: str

@@ -1,5 +1,5 @@
 import logging
-from config import settings
+from conf import settings
 
 
 def setup_logger():

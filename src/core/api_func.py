@@ -2,7 +2,7 @@ import re
 
 from core import FullSeasonGet, DownloadClient, RSSAnalyser
 from utils import json_config
-from config import settings
+from conf import settings
 
 from ab_decorator import api_failed
 
@@ -66,7 +66,7 @@ class APIProcess:
 
 
 if __name__ == '__main__':
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     API = APIProcess()
     API.add_subscribe("http://dmhy.org/topics/rss/rss.xml?keyword=彻夜之歌+星空+简")

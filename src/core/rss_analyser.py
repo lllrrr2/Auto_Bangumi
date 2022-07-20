@@ -4,7 +4,7 @@ import logging
 from network import RequestContent
 from parser import TitleParser
 
-from config import settings
+from conf import settings
 
 from core import DownloadClient
 
@@ -51,7 +51,7 @@ class RSSAnalyser:
 
 
 if __name__ == "__main__":
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     print(settings.host_ip)
     client = DownloadClient()

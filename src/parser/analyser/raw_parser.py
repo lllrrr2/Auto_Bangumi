@@ -1,7 +1,7 @@
 import logging
 import re
 
-from dataformat import Episode
+from dataset import Episode
 
 logger = logging.getLogger(__name__)
 

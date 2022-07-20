@@ -1,7 +1,8 @@
 import logging
 
-from parser.analyser import RawParser, DownloadParser, TMDBParser
-from config import settings
+from parser.analyser import RawParser, DownloadParser
+from parser.internet_parser import TMDBParser, BangumiParser
+from conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class TitleParser:
 
 if __name__ == '__main__':
     import re
-    from config.const_dev import DEV_SETTINGS
+    from conf import DEV_SETTINGS
     settings.init(DEV_SETTINGS)
     T = TitleParser()
     raw = "[Lilith-Raws] 在地下城寻求邂逅是否搞错了什么 / Danmachi S04 - 00 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]"

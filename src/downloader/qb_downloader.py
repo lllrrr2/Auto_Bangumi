@@ -4,7 +4,7 @@ import time
 from qbittorrentapi import Client, LoginFailed
 from qbittorrentapi.exceptions import Conflict409Error
 
-from config import settings
+from conf import settings
 from ab_decorator import qb_connect_failed_wait
 
 from downloader.exceptions import ConflictError
@@ -96,7 +96,7 @@ class QbDownloader:
 
 if __name__ == "__main__":
     try:
-        from config.const_dev import DEV_SETTINGS
+        from conf import DEV_SETTINGS
     except ModuleNotFoundError:
         logger.debug("Please copy `const_dev.py` to `const_dev.py` to use custom settings")
     settings.init(DEV_SETTINGS)

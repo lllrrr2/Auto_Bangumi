@@ -1,15 +1,14 @@
 import os
-from config import const
+
+from conf import const
+from __version__ import version
 from utils import json_config
 
-
-def DEFAULT_SETTINGS():
-    return json_config.load("config.json")
-
-
-def DEV_SETTINGS():
-    return json_config.load("config_dev.json")
-
+def SETTINGS():
+    if version == "DEV_VERSION":
+        return json_config.load("/Users/estrella/Developer/Auto_Bangumi/config/config_dev.json")
+    else:
+        return json_config.load("/config/config.json")
 
 class Settings(dict):
     def __getattr__(self, item):
@@ -40,4 +39,4 @@ class Settings(dict):
         }
 
 
-settings = Settings(DEFAULT_SETTINGS())
+settings = Settings(SETTINGS())

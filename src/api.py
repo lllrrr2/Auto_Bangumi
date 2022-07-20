@@ -8,14 +8,14 @@ from pydantic import BaseModel
 import logging
 
 from core import APIProcess
-from config import settings, parse
+from conf import settings, parse
 from utils import json_config
 
 logger = logging.getLogger(__name__)
 args = parse()
 if args.debug:
     try:
-        from config.const_dev import DEV_SETTINGS
+        from conf import DEV_SETTINGS
 
         settings.init(DEV_SETTINGS)
     except ModuleNotFoundError:
