@@ -1,15 +1,12 @@
 import re
-from dataclasses import dataclass
 
 from network.request import RequestURL
-from .notification import PostNotification
+# from .notification import PostNotification
 from conf import settings
+from dataset import TorrentInfo
 
 
-@dataclass
-class TorrentInfo:
-    name: str
-    torrent_link: str
+NOT_CONTAIN = "|".join(settings.not_contain)
 
 
 class RequestContent:
@@ -22,7 +19,7 @@ class RequestContent:
         torrent_titles = [item.title.string for item in soup.find_all("item")]
         keep_index = []
         for idx, title in enumerate(torrent_titles):
-            if re.search(settings.not_contain, title) is None:
+            if re.search(NOT_CONTAIN, title) is None:
                 keep_index.append(idx)
         torrent_urls = [item.get("url") for item in soup.find_all("enclosure")]
         return [TorrentInfo(torrent_titles[i], torrent_urls[i]) for i in keep_index]
@@ -45,6 +42,5 @@ if __name__ == "__main__":
     r = RequestContent()
     rss_url = "https://mikanani.me/RSS/Bangumi?bangumiId=2739&subgroupid=203"
     titles = r.get_torrents(rss_url)
-    print(settings.not_contain)
     for title in titles:
         print(title.name, title.torrent_link)

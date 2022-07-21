@@ -29,15 +29,19 @@ class TMDBParser:
                 return True
         return False
 
+    # TODO 修复非正常季度的问题
     @staticmethod
-    def get_season(seasons: list) -> int:
+    def get_season(seasons: list, this_year: bool) -> (int, str):
+        now_year = time.localtime().tm_year
         for season in seasons:
+            date = season.get("air_date").split("-")
+            [year, _, _] = date
             if re.search(r"第 \d 季", season.get("season")) is not None:
-                date = season.get("air_date").split("-")
-                [year, _ , _] = date
-                now_year = time.localtime().tm_year
-                if int(year) == now_year:
-                    return int(re.findall(r"\d", season.get("season"))[0])
+                if int(year) == now_year and this_year:
+                    now_season = int(re.findall(r"\d", season.get("season"))[0])
+                    poster_path = season.get("poster_path")
+                    break
+            return now_season, poster_path
 
     def tmdb_search(self, title) -> TMDBInfo:
         url = self.gen_search_url(title)
@@ -54,15 +58,15 @@ class TMDBParser:
         info_content = self._request.get_json(url_info)
         # 关闭链接
         self._request.close_session()
-        season = [{"season": s.get("name"), "air_date": s.get("air_date")} for s in info_content.get("seasons")]
-        last_season = self.get_season(season)
+        seasons = [{"season": s.get("name"), "air_date": s.get("air_date"), "poster_path": s.get("poster_path")} for s in info_content.get("seasons")]
+        last_season, poster_path = self.get_season(seasons)
         title_jp = info_content.get("original_name")
         title_zh = info_content.get("name")
         year_number = info_content.get("first_air_date").split("-")[0]
-        return TMDBInfo(id, title_jp, title_zh, season, last_season, year_number)
+        return TMDBInfo(id, title_jp, title_zh, seasons, last_season, year_number, poster_path)
 
 
 if __name__ == "__main__":
     test = "辉夜大小姐"
     info = TMDBParser().tmdb_search(test)
-    print(f"{info.title_zh}({info.year_number})")
+    print(info.poster_path)

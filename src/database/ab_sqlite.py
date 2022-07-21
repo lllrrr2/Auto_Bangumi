@@ -146,13 +146,12 @@ class DataBase:
         ))
         logger.info(f"Update column: {data.id} success.")
 
-    def delete_column(self, data: int or MainData):
+    def delete_column(self, _id: int):
         self.connect_db()
-        id = data if data is int else data.id
         self.cursor.execute("""
                DELETE FROM BANGUMI WHERE id = ?
-           """, (id,))
-        logger.info(f"Delete column: {id} success.")
+           """, (_id,))
+        logger.info(f"Delete column: {_id} success.")
 
     def select_contain_datas(self) -> list:
         self.connect_db()

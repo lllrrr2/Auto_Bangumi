@@ -11,6 +11,7 @@ ENV TZ=Asia/Shanghai
 
 ADD ./src /src
 RUN mkdir /config
+RUN mkdir /data
 ADD ./templates /templates
 
 RUN chmod a+x run.sh

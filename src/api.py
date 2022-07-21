@@ -8,20 +8,10 @@ from pydantic import BaseModel
 import logging
 
 from core import APIProcess
-from conf import settings, parse
+from conf import settings
 from utils import json_config
 
 logger = logging.getLogger(__name__)
-args = parse()
-if args.debug:
-    try:
-        from conf import DEV_SETTINGS
-
-        settings.init(DEV_SETTINGS)
-    except ModuleNotFoundError:
-        logger.debug("Please copy `const_dev.py` to `const_dev.py` to use custom settings")
-else:
-    settings.init()
 app = FastAPI()
 api_func = APIProcess()
 
@@ -47,6 +37,7 @@ templates = Jinja2Templates(directory="templates")
 def index(request: Request):
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
+
 
 @app.get("/api/v1/data")
 def get_data():

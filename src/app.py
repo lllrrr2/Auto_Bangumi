@@ -80,16 +80,6 @@ def main_process(bangumi_data, download_client: DownloadClient):
 
 
 def run():
-    # DEBUG 模式初始化
-    args = parse()
-    if args.debug:
-        try:
-            from conf import DEV_SETTINGS
-            settings.init(DEV_SETTINGS())
-        except ModuleNotFoundError:
-            logger.debug("Please copy `const_dev.py` to `const_dev.py` to use custom settings")
-    else:
-        settings.init()
     # 初始化
     reset_log()
     setup_logger()

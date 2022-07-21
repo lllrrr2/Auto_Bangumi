@@ -38,6 +38,7 @@ class RequestURL:
                 return req
             except Exception as e:
                 logger.debug(f"URL: {url}")
+                logger.debug(e)
                 logger.warning("ERROR with DNS/Connection.")
                 time.sleep(settings.connect_retry_interval)
                 times += 1
@@ -50,13 +51,3 @@ class RequestURL:
 
     def close(self):
         self.session.close()
-
-
-if __name__ == "__main__":
-    a = RequestURL()
-    socks.set_default_proxy(socks.SOCKS5, "192.168.30.2", 19990, True, username="abc", password="abc")
-    socket.socket = socks.socksocket
-    b = a.get_url('https://www.themoviedb.org').text
-    print(b)
-
-

@@ -16,10 +16,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Create Version info
         run: |
-          echo "version = '2.6.0'" > src/__version__.py
-      - uses: actions/checkout@v3
+          echo "version='2.6.0'" >> src/__version__.py
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:

@@ -31,9 +31,10 @@ class TMDBInfo:
     id: int
     title_jp: str
     title_zh: str
-    season: dict
+    season: list
     last_season: int
     year_number: int
+    poster_path: str
 
 
 @dataclass
@@ -71,4 +72,10 @@ class RuleInfo:
 class RePathInfo:
     path: str
     hashes: list
+
+# Torrent
+@dataclass
+class TorrentInfo:
+    name: str
+    torrent_link: str
 
