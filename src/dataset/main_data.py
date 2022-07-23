@@ -6,6 +6,7 @@ from dataclasses import dataclass
 class MainData:
     id: int or None
     # main data
+    official_title: str
     title_zh: str or None
     title_jp: str or None
     title_en: str or None
@@ -13,16 +14,19 @@ class MainData:
     season: int
     cover_url: str
     # extra info
-    sub_group: str
-    resolution: str
-    source: str
+    sub_group: str or None
+    resolution: str or None
+    source: str or None
+    sub_language: str or None
     # downloader info
     contain: str
     not_contain: str
-    added: bool
-    eps_collect: bool
     # rename info
     ep_offset: int
+    # trigger info
+    added: bool
+    eps_collect: bool
+
 
 
 # Parser

@@ -4,10 +4,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import logging
 
 from core import APIProcess
+from dataset import *
 from conf import settings
 from utils import json_config
 
@@ -29,66 +29,69 @@ app.add_middleware(
 )
 
 
-
 templates = Jinja2Templates(directory="templates")
 
 
+# HTML
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
 
 
-@app.get("/api/v1/data")
-def get_data():
-    data = json_config.load(settings.info_path)
-    return data
+# Main page info
+@app.get("/api/v1/info/Rules")
+def get_all_rules() -> list:
+    return api_func.get_all_rules()
 
 
-@app.get("/api/v1/log")
+@app.get("/api/v1/info/Log")
 async def get_log():
     log_path = settings.log_path
     return FileResponse(log_path)
 
 
-@app.get("/api/v1/resetRule")
+@app.get("/api/v1/info/Config")
+def get_config():
+    return json_config.load(settings.setting_path)
+
+
+# Set config
+@app.post("/api/v1/set/Config")
+def set_config(config: SetConf):
+    api_func.set_config(config)
+    return "Success"
+
+
+# Change Rule settings
+@app.post("/api/v1/set/Rule")
+def change_rule(rule: ChangeRule):
+    api_func.change_rule(rule)
+    return "Success"
+
+
+# Delete rule
+@app.get("/api/v1/set/removeRule/{id}")
+def remove_rule(id: str):
+    return api_func.remove_rule(id)
+
+
+@app.get("/api/v1/set/resetRule")
 def reset_rule():
     return api_func.reset_rule()
 
 
-@app.get("api/v1/removeRule/{name}")
-def remove_rule(name: str):
-    return api_func.remove_rule(name)
-
-
-class RssLink(BaseModel):
-    rss_link: str
-
-
-@app.post("/api/v1/collection")
+@app.post("/api/v1/add/Collection")
 async def collection(link: RssLink):
     return api_func.download_collection(link.rss_link)
 
 
-@app.post("/api/v1/subscribe")
+@app.post("/api/v1/add/Subscribe")
 async def subscribe(link: RssLink):
     return api_func.add_subscribe(link.rss_link)
 
 
-class ChangeRule(BaseModel):
-    official_title: str
-    must_contain: str
-    not_contain: str
-    season: int
-    on_air_year: int
-
-
-class AddRule(BaseModel):
-    title: str
-    season: int
-
-
-@app.post("/api/v1/addRule")
+@app.post("/api/v1/add/Rule")
 async def add_rule(info: AddRule):
     return api_func.add_rule(info.title, info.season)
 
