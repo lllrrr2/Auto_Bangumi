@@ -1,8 +1,11 @@
 import re
 
 from core import FullSeasonGet, DownloadClient, RSSAnalyser
-from utils import json_config
+from utils import json_config, convert_data
 from conf import settings
+from dataset import *
+from database import DataBase
+
 
 from ab_decorator import api_failed
 
@@ -12,40 +15,45 @@ class APIProcess:
         self._rss_analyser = RSSAnalyser()
         self._download_client = DownloadClient()
         self._full_season_get = FullSeasonGet()
+        self._data_base = DataBase()
 
-    def link_process(self, link):
+    def process_link(self, link):
         data = self._rss_analyser.rss_to_data(link)
         return data
 
+    def get_all_rules(self) -> [dict]:
+        datas = self._data_base.get_all_datas()
+        return [convert_data.convert_main_data(data) for data in datas]
+
+    @staticmethod
+    def set_config(config: SetConf):
+        json_config.save(settings.setting_path, convert_data.convert_config(config))
+        return "Success"
+
+    def change_rule(self, rule: ChangeRule):
+        self._data_base.change_rule(rule.id, rule.title, rule.season)
+        return "Success"
+
     @api_failed
     def download_collection(self, link):
-        data = self.link_process(link)
+        data = self.process_link(link)
         self._full_season_get.download_collection(data, link, self._download_client)
         return data
 
     @api_failed
     def add_subscribe(self, link):
-        data = self.link_process(link)
+        data = self.process_link(link)
         self._download_client.add_rss_feed(link, data.get("official_title"))
         self._download_client.set_rule(data, link)
         return data
 
-    @staticmethod
-    def reset_rule():
-        data = json_config.load(settings.info_path)
-        data["bangumi_info"] = []
-        json_config.save(settings.info_path, data)
+    def reset_rule(self):
+        self._data_base.reset_rule()
         return "Success"
 
-    @staticmethod
-    def remove_rule(name):
-        datas = json_config.load(settings.info_path)["bangumi_info"]
-        for data in datas:
-            if re.search(name.lower(), data["title_raw"].lower()) is not None:
-                datas.remove(data)
-                json_config.save(settings.info_path, datas)
-                return "Success"
-        return "Not matched"
+    def remove_rule(self, id: int):
+        self._data_base.delete_column(id)
+        return "Success"
 
     @staticmethod
     def add_rule(title, season):

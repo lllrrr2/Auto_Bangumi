@@ -1,3 +1,5 @@
+import os.path
+
 from dataset import MainData
 from conf import settings
 
@@ -13,9 +15,11 @@ class DataBase:
         self.cursor = None
 
     def create_db(self):
+        self.connect_db()
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS BANGUMI (
                 id INTEGER PRIMARY KEY,
+                official_title TEXT,
                 title_zh TEXT,
                 title_jp TEXT,
                 title_en TEXT,
@@ -25,9 +29,10 @@ class DataBase:
                 sub_group TEXT,
                 resolution TEXT,
                 source TEXT,
+                sub_language TEXT,
                 contain TEXT,
                 not_contain TEXT,
-                added INTEGER,
+                refresh INTEGER,
                 eps_collect INTEGER,
                 ep_offset INTEGER  
             );
@@ -39,10 +44,18 @@ class DataBase:
         self.conn = sqlite3.connect(settings.db_path)
         self.cursor = self.conn.cursor()
 
+    def init_db(self):
+        if os.path.exists(settings.db_path):
+            logger.info(f"{settings.db_path} already exists.")
+        else:
+            self.create_db()
+            logger.info(f"Database created.")
+
     def insert_data(self, data: MainData):
         self.connect_db()
         self.cursor.execute("""
             INSERT INTO BANGUMI (
+                official_title,
                 title_zh,
                 title_jp,
                 title_en,
@@ -52,13 +65,15 @@ class DataBase:
                 sub_group,
                 resolution,
                 source,
+                sub_language,
                 contain,
                 not_contain,
                 added,
                 eps_collect,
                 ep_offset
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
+            data.official_title,
             data.title_zh,
             data.title_jp,
             data.title_en,
@@ -68,17 +83,20 @@ class DataBase:
             data.sub_group,
             data.resolution,
             data.source,
+            data.sub_language,
             data.contain,
             data.not_contain,
             1 if data.added else 0,
             1 if data.eps_collect else 0,
             data.ep_offset
         ))
+        self.conn.commit()
 
     def insert_datas(self, datas: list):
         self.connect_db()
         for data in datas:
             self.insert_data(data)
+        self.conn.close()
 
     def get_all_datas(self) -> [MainData]:
         self.connect_db()
@@ -91,20 +109,22 @@ class DataBase:
         for data in datas:
             data_list.append(MainData(
                 id=data[0],
-                title_zh=data[1],
-                title_jp=data[2],
-                title_en=data[3],
-                year=data[4],
-                season=data[5],
-                cover_url=data[6],
-                sub_group=data[7],
-                resolution=data[8],
-                source=data[9],
-                contain=data[10],
-                not_contain=data[11],
-                added=data[12],
-                eps_collect=data[13],
-                ep_offset=data[14]
+                official_title=data[1],
+                title_zh=data[2],
+                title_jp=data[3],
+                title_en=data[4],
+                year=data[5],
+                season=data[6],
+                cover_url=data[7],
+                sub_group=data[9],
+                resolution=data[9],
+                source=data[10],
+                sub_language=data[11],
+                contain=data[12],
+                not_contain=data[13],
+                added=data[14],
+                eps_collect=data[15],
+                ep_offset=data[16]
             ))
         return data_list
 
@@ -145,6 +165,7 @@ class DataBase:
             data.id
         ))
         logger.info(f"Update column: {data.id} success.")
+        self.commit()
 
     def delete_column(self, _id: int):
         self.connect_db()
@@ -165,10 +186,5 @@ class DataBase:
 
 if __name__ == '__main__':
     db = DataBase()
-    # db.delete_column(1)
-    # data = MainData(None, "测试", "测试", "Test", 2020, 1, "Lilith", "测试", "测试", "测试", "测试", "测试", True, False, 0)
-    # for data in db.get_all_datas():
-    #     print(data.title_zh)
-    # db.commit()
-
-    print(db.select_contain_datas())
+    data = MainData(id=None, official_title='Lycoris Recoil', title_zh='', title_jp='', title_en='Lycoris Recoil', year=2015, season=1, cover_url='cover_url', sub_group='NC-Raws', resolution='1920x1080', source=None, sub_language=None, contain='Lycoris Recoil', not_contain=['720', '\\d+-\\d+'], ep_offset=0, added=False, eps_collect=False)
+    db.insert_data(data)
