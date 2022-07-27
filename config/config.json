@@ -16,7 +16,7 @@
     "dev_debug": false,
     "eps_complete": false,
     "webui_port": 7892,
-    "title_language": "zh",
+    "language": "zh",
     "tmdb_api": "32b19d6a05b512190a056fa4e747cbbc",
     "enable_tmdb": false,
     "http_proxy": null,
