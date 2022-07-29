@@ -34,7 +34,7 @@ class TitleParser:
         season = tmdb_info.last_season
         return official_title, season
 
-    def return_data(self, raw: str) -> MainData:
+    def analyse(self, raw: str) -> MainData:
         try:
             episode = self.raw_parser(raw)
             title_search = episode.title_zh if episode.title_zh != "" else episode.title_en

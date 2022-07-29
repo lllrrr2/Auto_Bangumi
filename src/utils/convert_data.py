@@ -1,26 +1,25 @@
 from dataset import *
 
 
-def convert_main_data(data: MainData) -> dict:
-    return {
-        "id": data.id,
-        "official_title": data.official_title,
-        "title_zh": data.title_zh,
-        "title_jp": data.title_jp,
-        "title_en": data.title_en,
-        "year": data.year,
-        "season": data.season,
-        "cover_url": data.cover_url,
-        "sub_group": data.sub_group,
-        "resolution": data.resolution,
-        "source": data.source,
-        "contain": data.contain,
-        "not_contain": data.not_contain,
-        "added": data.added,
-        "eps_collect": data.eps_collect,
-        "ep_offset": data.ep_offset
-    }
+def data_to_dict(data: MainData) -> dict:
+    return data.__dict__
 
 
-def convert_config(config: SetConf) -> dict:
-    return {}
+def dict_to_main_data(data: dict) -> MainData:
+    return MainData(**data)
+
+
+def dict_to_config_data(data: dict) -> SetConf:
+    return SetConf(**data)
+
+
+if __name__ == '__main__':
+    from parser import TitleParser
+    parser = TitleParser()
+    raw = "[Lilith-Raws] 在地下城寻求邂逅是否搞错了什么 / Danmachi S04 - 01 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]"
+    data = parser.analyse(raw)
+    print(data)
+    dict = data_to_dict(data)
+    print(dict)
+    data2 = dict_to_main_data(dict)
+    print(data2)

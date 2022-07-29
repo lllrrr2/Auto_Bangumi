@@ -1,5 +1,4 @@
 import os
-
 from conf import const
 from __version__ import version
 from utils import json_config
@@ -42,3 +41,5 @@ class Settings(dict):
 
 
 settings = Settings(SETTINGS())
+
+
