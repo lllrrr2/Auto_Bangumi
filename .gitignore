@@ -172,6 +172,6 @@ cython_debug/
 /src/debug_run.sh
 /src/__version__.py
 
-config/bangumi.json
-config/log.txt
-config/config_dev.json
+
+/config
+/config/*

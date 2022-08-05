@@ -4,6 +4,7 @@ import os
 
 from downloader import getClient
 from downloader.exceptions import ConflictError
+from dataset import MainData
 
 from conf import settings
 
@@ -22,16 +23,15 @@ class DownloadClient:
             "rss_refresh_interval": 30,
         }
         self.client.prefs_init(prefs=prefs)
-        if settings.download_path == "":
+        if settings.config.download_path == "":
             prefs = self.client.get_app_prefs()
-            settings.download_path = os.path.join(prefs["save_path"], "Bangumi")
+            settings.config.download_path = os.path.join(prefs["save_path"], "Bangumi")
 
-    def set_rule(self, info: dict, rss_link):
-        official_name, raw_name, season, group = info["official_title"], info["title_raw"], info["season"], info["group"]
+    def set_rule(self, info: MainData, rss_link):
         rule = {
             "enable": True,
-            "mustContain": raw_name,
-            "mustNotContain": settings.not_contain,
+            "mustContain": info.contain,
+            "mustNotContain": info.not_contain,
             "useRegex": True,
             "episodeFilter": "",
             "smartFilter": False,
@@ -39,27 +39,27 @@ class DownloadClient:
             "affectedFeeds": [rss_link],
             "ignoreDays": 0,
             "lastMatch": "",
-            "addPaused": settings.dev_debug,
+            "addPaused": settings.config.dev_debug,
             "assignedCategory": "Bangumi",
             "savePath": str(
                 os.path.join(
-                    settings.download_path,
-                    re.sub(settings.rule_name_re, " ", official_name).strip(),
-                    f"Season {season}",
+                    settings.config_path.download_path,
+                    re.sub(r"[\\:;]", " ", info.official_title).strip(),
+                    f"Season {info.season}",
                 )
             ),
         }
-        rule_name = f"[{group}] {official_name}" if settings.enable_group_tag else official_name
-        self.client.rss_set_rule(rule_name=f"{rule_name} S{season}", rule_def=rule)
-        logger.info(f"Add {official_name} Season {season}")
+        rule_name = f"[{info.sub_group}] {info.official_title}" if settings.config.enable_group_tag else info.official_title
+        self.client.rss_set_rule(rule_name=f"{rule_name} S{info.season}", rule_def=rule)
+        logger.info(f"Add {info.official_title} Season {info.season}")
 
     def rss_feed(self):
-        if not settings.refresh_rss:
-            if self.client.get_rss_info() == settings.rss_link:
+        if not settings.config.refresh_rss:
+            if self.client.get_rss_info() == settings.config.rss_link:
                 logger.info("RSS Already exists.")
             else:
                 logger.info("No feed exists, start adding feed.")
-                self.client.rss_add_feed(url=settings.rss_link, item_path="Mikan_RSS")
+                self.client.rss_add_feed(url=settings.config.rss_link, item_path="Mikan_RSS")
                 logger.info("Add RSS Feed successfully.")
         else:
             try:
@@ -67,7 +67,7 @@ class DownloadClient:
             except ConflictError:
                 logger.info("No feed exists, start adding feed.")
             try:
-                self.client.rss_add_feed(url=settings.rss_link, item_path="Mikan_RSS")
+                self.client.rss_add_feed(url=settings.config.rss_link, item_path="Mikan_RSS")
                 logger.info("Add RSS Feed successfully.")
             except ConnectionError:
                 logger.warning("Error with adding RSS Feed.")
@@ -78,23 +78,26 @@ class DownloadClient:
         self.client.rss_add_feed(url=rss_link, item_path=item_path)
         logger.info("Add RSS Feed successfully.")
 
-    def add_rules(self, bangumi_info, rss_link=settings.rss_link):
+    def add_rules(self, bangumi_info: list[MainData], rss_link):
         logger.debug("Start adding rules.")
         for info in bangumi_info:
-            if not info["added"]:
+            if not info.added:
                 self.set_rule(info, rss_link)
-                info["added"] = True
+                info.added = True
         # logger.info("to rule.")
         logger.debug("Finished.")
 
-    def get_torrent_info(self):
+    def get_torrents_info(self):
         return self.client.torrents_info(
             status_filter="completed", category="Bangumi"
         )
 
-    def rename_torrent_file(self, hash, path_name, new_name):
+    def get_torrent_info(self, _hash):
+        return self.client.torrent_info(_hash)
+
+    def rename_torrent_file(self, _hash, path_name, new_name):
         self.client.torrents_rename_file(
-            torrent_hash=hash, old_path=path_name, new_path=new_name
+            torrent_hash=_hash, old_path=path_name, new_path=new_name
         )
         logger.info(f"{path_name} >> {new_name}")
 
@@ -127,13 +130,5 @@ class DownloadClient:
     def get_torrent_path(self, hashes):
         return self.client.get_torrent_path(hashes)
 
-
-if __name__ == "__main__":
-    from conf import DEV_SETTINGS
-    settings.init(DEV_SETTINGS)
-    put = DownloadClient()
-    info = put.get_torrent_info()
-    for i in info:
-        print(i.name)
 
 

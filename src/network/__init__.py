@@ -6,7 +6,7 @@ from conf import settings
 from dataset import TorrentInfo
 
 
-NOT_CONTAIN = "|".join(settings.not_contain)
+NOT_CONTAIN = "|".join(settings.config.not_contain)
 
 
 class RequestContent:

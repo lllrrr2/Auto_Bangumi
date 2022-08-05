@@ -13,6 +13,12 @@ def save(filename, obj):
     pass
 
 
+def append(filename, obj):
+    with open(filename, "a", encoding="utf-8") as f:
+        json.dump(obj, f, indent=4, separators=(",", ": "), ensure_ascii=False)
+    pass
+
+
 def get(url):
     req = requests.get(url)
     return req.json()

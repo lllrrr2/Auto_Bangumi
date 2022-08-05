@@ -46,7 +46,7 @@ class Repath:
         return different_data
 
     def get_matched_torrents_list(self, repath_rules: [RuleInfo]) -> [RePathInfo]:
-        infos = self._client.get_torrent_info()
+        infos = self._client.get_torrents_info()
         repath_list = []
         for rule in repath_rules:
             hashes = []

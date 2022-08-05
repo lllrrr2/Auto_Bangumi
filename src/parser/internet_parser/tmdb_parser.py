@@ -6,7 +6,7 @@ from conf import settings
 from dataset import TMDBInfo
 
 TMDB_API_URl = "https://api.themoviedb.org/3/"
-API_KEY = f"api_key={settings.tmdb_api}"
+API_KEY = f"api_key={settings.config.tmdb_api}"
 
 
 class TMDBParser:

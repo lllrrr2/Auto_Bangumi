@@ -17,13 +17,12 @@ ENV_TO_ATTR = {
     ),
     "AB_REMOVE_BAD_BT": ("remove_bad_torrent", lambda e: e.lower() in ("true", "1", "t")),
     "AB_WEBUI_PORT": ("webui_port", lambda e: int(e)),
-    "AB_HTTP_PROXY": "http_proxy",
     "AB_LANGUAGE": "title_language",
     "AB_ENABLE_TMDB": ("enable_tmdb", lambda e: e.lower() in ("true", "1", "t")),
+    "AB_HTTP_PROXY": "http_proxy",
     "AB_SOCKS": "socks",
     "AB_RENAME": ("enable_rename", lambda e: e.lower() in ("true", "1", "t")),
     "AB_RSS_COLLECTOR": ("enable_rss_collector", lambda e: e.lower() in ("true", "1", "t")),
-    "AB_RESET_FOLDER": ("reset_folder", lambda e: e.lower() in ("true", "1", "t"))
 }
 
 

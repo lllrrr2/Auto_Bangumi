@@ -53,7 +53,7 @@ async def get_log():
 
 @app.get("/api/v1/info/Config")
 def get_config():
-    return json_config.load(settings.setting_path)
+    return json_config.load(settings.config_path)
 
 
 # Set config
@@ -63,7 +63,7 @@ def set_config(config: SetConf):
     return "Success"
 
 
-# Change Rule settings
+# Change Rule settings.config
 @app.post("/api/v1/set/Rule")
 def change_rule(rule: ChangeRule):
     api_func.change_rule(rule)
@@ -98,7 +98,7 @@ async def add_rule(info: AddRule):
 
 def run():
     LOGGING_CONFIG["formatters"]["default"]["fmt"] = "[%(asctime)s] %(levelprefix)s %(message)s"
-    uvicorn.run(app, host="0.0.0.0", port=settings.webui_port)
+    uvicorn.run(app, host="0.0.0.0", port=settings.config.webui_port)
 
 
 if __name__ == "__main__":

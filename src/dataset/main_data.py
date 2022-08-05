@@ -4,7 +4,6 @@ from dataclasses import dataclass
 # main data
 @dataclass
 class MainData:
-    id: int or None
     # main data
     official_title: str
     title_zh: str or None
@@ -26,6 +25,7 @@ class MainData:
     # trigger info
     added: bool
     eps_collect: bool
+    changed: bool
 
 
 
@@ -67,9 +67,10 @@ class Episode:
 class RuleInfo:
     rule_name: str
     contain: str
+    not_contain: str
     season: int
     folder_name: str
-    new_path: str
+    path: str
 
 
 @dataclass

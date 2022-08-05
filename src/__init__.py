@@ -1,0 +1,7 @@
+__title__ = "AutoBangumi"
+__description__ = "AutoBangumi is a tool to help you to download and organize your favorite anime."
+__url__ = "https://github.com/EstrellaXD/Auto_Bangumi"
+__version__ = "DEV_VERSION"
+__author__ = "Estrella Pan"
+__author_email__ = "estrellaxd05@gmail.com"
+__license__ = "MIT"

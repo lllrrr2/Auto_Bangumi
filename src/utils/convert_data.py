@@ -9,9 +9,6 @@ def dict_to_main_data(data: dict) -> MainData:
     return MainData(**data)
 
 
-def dict_to_config_data(data: dict) -> SetConf:
-    return SetConf(**data)
-
 
 if __name__ == '__main__':
     from parser import TitleParser

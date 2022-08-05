@@ -42,6 +42,9 @@ class QbDownloader:
     def torrents_info(self, status_filter, category):
         return self._client.torrents_info(status_filter, category)
 
+    def torrent_info(self, _hash):
+        return self._client.torrents_files(torrent_hash=_hash)
+
     def torrents_add(self, urls, save_path, category):
         return self._client.torrents_add(
             is_paused=settings.dev_debug,
@@ -50,10 +53,10 @@ class QbDownloader:
             category=category,
         )
 
-    def torrents_delete(self, hash):
+    def torrents_delete(self, _hash):
         return self._client.torrents_delete(
-            delete_files=False,
-            torrent_hashes=hash
+            delete_files=True,
+            torrent_hashes=_hash
         )
 
     def torrents_rename_file(self, torrent_hash, old_path, new_path):
@@ -90,16 +93,5 @@ class QbDownloader:
     def get_download_rule(self):
         return self._client.rss_rules()
 
-    def get_torrent_path(self, hash):
-        return self._client.torrents_info(hashes=hash)[0].save_path
-
-
-if __name__ == "__main__":
-    try:
-        from conf import DEV_SETTINGS
-    except ModuleNotFoundError:
-        logger.debug("Please copy `const_dev.py` to `const_dev.py` to use custom settings")
-    settings.init(DEV_SETTINGS)
-    client = QbDownloader(settings.host_ip, settings.user_name, settings.password)
-    path = client.get_torrent_path("39adad0d0c82ebb3971810a7592e03138b7345d2")
-    print(path)
+    def get_torrent_path(self, _hash):
+        return self._client.torrents_info(hashes=_hash)[0].save_path

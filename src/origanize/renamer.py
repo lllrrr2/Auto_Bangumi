@@ -10,11 +10,11 @@ from core import DownloadClient
 from parser import TitleParser
 
 logger = logging.getLogger(__name__)
+MEDIA_SUFFIX = ["mp4", "mkv"]
 
 
 class Renamer:
-    def __init__(self, download_client: DownloadClient):
-        self.client = download_client
+    def __init__(self):
         self._renamer = TitleParser()
 
     @staticmethod
@@ -23,27 +23,19 @@ class Renamer:
             logger.info(f"Finished checking {torrent_count} files' name, renamed {rename_count} files.")
         logger.debug(f"Checked {torrent_count} files")
 
-    def get_torrent_info(self):
-        recent_info = self.client.get_torrent_info()
-        torrent_count = len(recent_info)
-        return recent_info, torrent_count
-
     @staticmethod
     def split_path(path: str):
         suffix = os.path.splitext(path)[-1]
-        path = path.replace(settings.download_path, "")
+        path = path.replace(settings.config.download_path, "")
         path_parts = PurePath(path).parts \
             if PurePath(path).name != path \
             else PureWindowsPath(path).parts
         path_name = path_parts[-1]
-        try:
-            if re.search(r"S\d{1,2}|[Ss]eason", path_parts[-2]) is not None:
-                season = int(re.search(r"\d{1,2}", path_parts[-2]).group())
-            else:
-                season = 1
-        except Exception as e:
-            logger.debug("No Season info")
+        if re.search(r"S\d{1,2}|[Ss]eason", path_parts[-2]) is not None:
+            season = int(re.search(r"\d{1,2}", path_parts[-2]).group())
+        else:
             season = 1
+            logger.warning(f"No season info.")
         folder_name = path_parts[1] if path_parts[0] == "/" else path_parts[0]
         try:
             download_path = path_parts[1]
@@ -51,45 +43,59 @@ class Renamer:
             download_path = ""
         return path_name, season, folder_name, suffix, download_path
 
-    def run(self):
-        recent_info, torrent_count = self.get_torrent_info()
+    def rename_torrent(self,
+                       info,
+                       download_client: DownloadClient,
+                       rename_count: int
+                       ):
+        name = info.name
+        torrent_hash = info.hash
+        path_name, season, folder_name, suffix, _ = self.split_path(info.content_path)
+        try:
+            new_name = self._renamer.download_parser(name, folder_name, season, suffix, settings.config.method)
+            if path_name != new_name:
+                download_client.rename_torrent_file(torrent_hash, path_name, new_name)
+                rename_count += 1
+        except Exception as e:
+            self.rename_collection(torrent_hash, folder_name, season, info.content_path, download_client)
+
+    def rename_collection(self, _hash, folder_name, season, content_path, download_client: DownloadClient):
+        contents = download_client.get_torrent_info(_hash)
+        for content in contents:
+            suffix = os.path.splitext(content.name)[-1]
+            if suffix in MEDIA_SUFFIX:
+                try:
+                    new_name = self._renamer.download_parser(
+                        content.name,
+                        folder_name,
+                        season,
+                        suffix,
+                        settings.config.method
+                    )
+                    if new_name != content.name:
+                        download_client.rename_torrent_file(_hash,
+                                                            os.path.join(content_path,content.name),
+                                                            os.path.join(content_path,new_name)
+                                                            )
+                except Exception as e:
+                    logger.debug(e)
+                    logger.warning(f"{content.name} rename failed")
+                    if settings.config.remove_bad_torrent:
+                        download_client.delete_torrent(_hash)
+
+    def run(self, download_client: DownloadClient):
+        recent_info = download_client.get_torrents_info()
+        torrent_count = recent_info.__len__()
         rename_count = 0
         failed_hashes = []
         for info in recent_info:
-            name = info.name
-            torrent_hash = info.hash
-            path_name, season, folder_name, suffix, _ = self.split_path(info.content_path)
-
-            try:
-                new_name = self._renamer.download_parser(name, folder_name, season, suffix, settings.method)
-                if path_name != new_name:
-                    self.client.rename_torrent_file(torrent_hash, path_name, new_name)
-                    rename_count += 1
-                else:
-                    continue
-            except Exception as e:
-                logger.debug(e)
-                logger.warning(f"{path_name} rename failed")
-                failed_hashes.append(info.hash)
-                if settings.remove_bad_torrent:
-                    self.client.delete_torrent(torrent_hash)
+            self.rename_torrent(info, download_client, rename_count, failed_hashes)
         self.print_result(torrent_count, rename_count)
         return failed_hashes
 
-    def set_folder(self):
-        recent_info, _ = self.get_torrent_info()
-        for info in recent_info:
-            torrent_hash = info.hash
-            _, season, folder_name, _, download_path = self.split_path(info.content_path)
-            new_path = os.path.join(settings.download_path, folder_name, f"Season {season}")
-            # print(new_path)
-            self.client.move_torrent(torrent_hash, new_path)
-
 
 if __name__ == "__main__":
-    from conf import DEV_SETTINGS
-    settings.init(DEV_SETTINGS)
     client = DownloadClient()
-    rename = Renamer(client)
-    rename.run()
-    # rename.set_folder()
+    hash = "7c344a0e767e3f8b9c6e9867e97f24174f8f237d"
+    info = client.get_torrent_info(hash)
+    print(info)

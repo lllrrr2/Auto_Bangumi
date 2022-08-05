@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class RSSFilter:
     def __init__(self):
-        self.filter_rule = json_config.load(settings.filter_rule)
+        self.filter_rule = json_config.load(settings.config.filter_rule)
 
     def filter(self, item: BeautifulSoup):
         title = item.title.string

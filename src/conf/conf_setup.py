@@ -1,45 +1,50 @@
 import os
-from conf import const
-from __version__ import version
-from utils import json_config
+import logging
 
+from dataset import Config
+from utils import json_config, get_project_root
 
-def SETTINGS():
-    if version == "DEV_VERSION":
-        return json_config.load("/Users/estrella/Developer/Auto_Bangumi/config/config_dev.json")
-    else:
-        return json_config.load("/config/config.json")
+from __version__ import __version__
+from conf.const import ENV_TO_ATTR
 
+ABS_PATH = get_project_root()
+logger = logging.getLogger(__name__)
 
-class Settings(dict):
-    def __getattr__(self, item):
-        return self.get(item)
+class ConfigSetup:
+    def __init__(self):
+        if __version__ == "DEV_VERSION":
+            dir_path = ABS_PATH
+        else:
+            dir_path = "/"
+        self.config_path = os.path.join(dir_path, "config", "config.json")
+        self.log_path = os.path.join(dir_path, "config", "log.log")
+        self.data_path = os.path.join(dir_path, "data", "data.json")
+        self.data_config = os.path.join(dir_path, "data", "data_config.json")
+        self.version = __version__
+        self.config = Config()
 
-    def __setattr__(self, key, value):
-        self[key] = value
+    def load_from_env(self):
+        # load config from env using ENV_TO_ATTR
+        for env_key, attr_key in ENV_TO_ATTR.items():
+            if isinstance(attr_key, tuple):
+                attr_key, convert_func = attr_key
+            else:
+                convert_func = lambda e: e
+            if env_key in os.environ:
+                setattr(self.config, attr_key, convert_func(os.environ[env_key]))
 
-    def init(self, args=None):
-        self.update(self._settings_from_env())
-        if args:
-            self.update(args)
+    def create_config(self):
+        if not os.path.exists(self.config_path):
+            self.save_config(self.config)
 
-    def _val_from_env(self, env, attr):
-        """Transforms env-strings to python."""
-        val = os.environ[env]
-        if isinstance(attr, tuple):
-            conv_func = attr[1]
-            val = conv_func(val)
-        return val
+    def save_config(self, settings: Config):
+        json_config.save(self.config_path, settings.__dict__)
+        logger.info(f"Config saved.")
 
-    def _settings_from_env(self):
-        """Loads settings from env."""
-        return {
-            attr if isinstance(attr, str) else attr[0]: self._val_from_env(env, attr)
-            for env, attr in const.ENV_TO_ATTR.items()
-            if env in os.environ
-        }
+    def update(self):
+        config_json = json_config.load(self.config_path)
+        self.config = Config(**config_json)
 
-
-settings = Settings(SETTINGS())
-
-
+    def init(self, path: str):
+        config_json = json_config.load(path)
+        self.config = Config(**config_json)

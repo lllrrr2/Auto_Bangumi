@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 class RequestURL:
     def __init__(self):
         self.session = requests.session()
-        if settings.http_proxy is not None:
+        if settings.config.http_proxy is not None:
             self.session.proxies = {
                 "https": settings.http_proxy,
                 "http": settings.http_proxy,
             }
-        elif settings.socks is not None:
+        elif settings.config.socks is not None:
             socks_info = settings.socks.split(",")
             socks.set_default_proxy(socks.SOCKS5, addr=socks_info[0], port=int(socks_info[1]), rdns=True,
                                     username=socks_info[2], password=socks_info[3])
@@ -40,7 +40,7 @@ class RequestURL:
                 logger.debug(f"URL: {url}")
                 logger.debug(e)
                 logger.warning("ERROR with DNS/Connection.")
-                time.sleep(settings.connect_retry_interval)
+                time.sleep(5)
                 times += 1
 
     def get_content(self, url, content="xml"):

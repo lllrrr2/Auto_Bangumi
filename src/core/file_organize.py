@@ -1,5 +1,5 @@
 from origanize import *
-from download_client import DownloadClient
+from core import DownloadClient
 from conf import settings
 
 

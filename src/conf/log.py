@@ -3,7 +3,7 @@ from conf import settings
 
 
 def setup_logger():
-    level = logging.DEBUG if settings.debug_mode else logging.INFO
+    level = logging.DEBUG if settings.config.debug_mode else logging.INFO
     logging.addLevelName(logging.DEBUG, 'DEBUG:')
     logging.addLevelName(logging.INFO, 'INFO:')
     logging.addLevelName(logging.WARNING, 'WARNING:')
