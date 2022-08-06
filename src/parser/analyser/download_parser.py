@@ -18,37 +18,42 @@ class DownloadInfo:
     folder_name: str
 
 
-class DownloadParser:
-    def __init__(self):
-        self.rules = [
+MATCH_RULE = [
             r"(.*) - (\d{1,4}|\d{1,4}\.\d{1,2})(?:v\d{1,2})?(?: )?(?:END)?(.*)",
             r"(.*)[\[ E](\d{1,3}|\d{1,3}\.\d{1,2})(?:v\d{1,2})?(?: )?(?:END)?[\] ](.*)",
             r"(.*)\[第(\d*\.*\d*)话(?:END)?\](.*)",
             r"(.*)\[第(\d*\.*\d*)話(?:END)?\](.*)",
             r"(.*)第(\d*\.*\d*)话(?:END)?(.*)",
             r"(.*)第(\d*\.*\d*)話(?:END)?(.*)",
+            r"(.*) S\d{1,3}E(\d+)(.*)"
         ]
+RE_MATCH_RULE = [re.compile(rule) for rule in MATCH_RULE]
+
+
+class DownloadParser:
+    def __init__(self):
+        pass
 
     @staticmethod
     def rename_init(name, folder_name, season, suffix) -> DownloadInfo:
         n = re.split(r"[\[\]()【】（）]", name)
         suffix = suffix if suffix is not None else n[-1]
-        file_name = name.replace(f"[{n[1]}]", "")
+        file_name = name.replace(f"[{n[1]}]", "") if n.__len__() > 1 else name
         if season < 10:
             season = f"0{season}"
         return DownloadInfo(name, season, suffix, file_name, folder_name)
 
     def rename_normal(self, info: DownloadInfo):
-        for rule in self.rules:
-            match_obj = re.match(rule, name, re.I)
+        for rule in RE_MATCH_RULE:
+            match_obj = rule.match(info.file_name)
             if match_obj is not None:
                 title = re.sub(r"([Ss]|Season )\d{1,3}", "", match_obj.group(1)).strip()
                 new_name = f"{title} S{info.season}E{match_obj.group(2)}{match_obj.group(3)}"
                 return new_name
 
     def rename_pn(self, info: DownloadInfo):
-        for rule in self.rules:
-            match_obj = re.match(rule, info.file_name, re.I)
+        for rule in RE_MATCH_RULE:
+            match_obj = rule.match(info.file_name)
             if match_obj is not None:
                 title = re.sub(r"([Ss]|Season )\d{1,3}", "", match_obj.group(1)).strip()
                 title = title if title != "" else info.folder_name
@@ -60,8 +65,8 @@ class DownloadParser:
                 return new_name
 
     def rename_advance(self, info: DownloadInfo):
-        for rule in self.rules:
-            match_obj = re.match(rule, info.file_name, re.I)
+        for rule in RE_MATCH_RULE:
+            match_obj = rule.match(info.file_name)
             if match_obj is not None:
                 new_name = re.sub(
                     r"[\[\]]",
@@ -71,8 +76,8 @@ class DownloadParser:
                 return new_name
 
     def rename_no_season_pn(self, info: DownloadInfo):
-        for rule in self.rules:
-            match_obj = re.match(rule, info.file_name, re.I)
+        for rule in RE_MATCH_RULE:
+            match_obj = rule.match(info.file_name)
             if match_obj is not None:
                 title = match_obj.group(1).strip()
                 new_name = re.sub(
@@ -100,7 +105,7 @@ class DownloadParser:
 
 
 if __name__ == "__main__":
-    name = " [MCE][Kidou Senshi Gundam Suisei no Majo][PROLOGUE][00][GB][1080p][x264 AAC].mp4"
+    name = "[Sub]Kidou Senshi Gundam Suisei no Majo - 01.mp4"
     rename = DownloadParser()
     new_name = rename.download_rename(name, "Made abyess", 1, ".mp4", "pn")
     print(new_name)

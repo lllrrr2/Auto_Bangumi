@@ -10,10 +10,10 @@ from core import DownloadClient
 from parser import TitleParser
 
 logger = logging.getLogger(__name__)
-MEDIA_SUFFIX = ["mp4", "mkv"]
+MEDIA_SUFFIX = [".mp4", ".mkv"]
 
 
-class Renamer:
+class RenameTorrent:
     def __init__(self):
         self._renamer = TitleParser()
 
@@ -52,7 +52,13 @@ class Renamer:
         torrent_hash = info.hash
         path_name, season, folder_name, suffix, _ = self.split_path(info.content_path)
         try:
-            new_name = self._renamer.download_parser(name, folder_name, season, suffix, settings.config.method)
+            new_name = self._renamer.download_parser(
+                                                    name,
+                                                    folder_name,
+                                                    season,
+                                                    suffix,
+                                                    settings.config.rename_method
+                                                    )
             if path_name != new_name:
                 download_client.rename_torrent_file(torrent_hash, path_name, new_name)
                 rename_count += 1
@@ -70,12 +76,12 @@ class Renamer:
                         folder_name,
                         season,
                         suffix,
-                        settings.config.method
+                        settings.config.rename_method
                     )
                     if new_name != content.name:
                         download_client.rename_torrent_file(_hash,
-                                                            os.path.join(content_path,content.name),
-                                                            os.path.join(content_path,new_name)
+                                                            content.name,
+                                                            new_name
                                                             )
                 except Exception as e:
                     logger.debug(e)
@@ -87,15 +93,14 @@ class Renamer:
         recent_info = download_client.get_torrents_info()
         torrent_count = recent_info.__len__()
         rename_count = 0
-        failed_hashes = []
         for info in recent_info:
-            self.rename_torrent(info, download_client, rename_count, failed_hashes)
+            self.rename_torrent(info, download_client, rename_count)
         self.print_result(torrent_count, rename_count)
-        return failed_hashes
 
 
 if __name__ == "__main__":
     client = DownloadClient()
+    renamer = RenameTorrent()
     hash = "7c344a0e767e3f8b9c6e9867e97f24174f8f237d"
-    info = client.get_torrent_info(hash)
-    print(info)
+    renamer.rename_collection(hash, "", 1, "", client)
+

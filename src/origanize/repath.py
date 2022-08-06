@@ -8,7 +8,7 @@ from dataset import RuleInfo,RePathInfo
 logger = logging.getLogger(__name__)
 
 
-class Repath:
+class RepathTorrent:
     def __init__(self, download_client: DownloadClient):
         self._client = download_client
         self.re_season = re.compile(r"S\d{1,2}")

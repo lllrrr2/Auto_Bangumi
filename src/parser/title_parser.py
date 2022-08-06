@@ -70,6 +70,6 @@ class TitleParser:
 if __name__ == '__main__':
     T = TitleParser()
     settings.config.enable_tmdb = True
-    raw = "[Lilith-Raws] 在地下城寻求邂逅是否搞错了什么 / Danmachi S04 - 01 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]"
-    data = T.analyse(raw)
+    raw = "Danmachi S04E01.mp4"
+    data = T.download_parser(raw, "Danmachi", 4, ".mp4")
     print(data)

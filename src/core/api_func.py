@@ -4,7 +4,7 @@ from core import FullSeasonGet, DownloadClient, RSSAnalyser
 from utils import json_config, convert_data
 from conf import settings
 from dataset import *
-from database import DataBase
+from database import DataJson
 
 
 from ab_decorator import api_failed
@@ -15,23 +15,23 @@ class APIProcess:
         self._rss_analyser = RSSAnalyser()
         self._download_client = DownloadClient()
         self._full_season_get = FullSeasonGet()
-        self._data_base = DataBase()
+        self._data = DataJson
 
     def process_link(self, link):
         data = self._rss_analyser.rss_to_data(link)
         return data
 
-    def get_all_rules(self) -> [dict]:
+    def get_all_rules(self) -> list[dict]:
         datas = self._data_base.get_all_datas()
-        return [convert_data.convert_main_data(data) for data in datas]
+        return [convert_data.data_to_dict(data) for data in datas]
 
     @staticmethod
-    def set_config(config: SetConf):
-        json_config.save(settings.setting_path, convert_data.convert_config(config))
+    def set_config(config: Config):
+        settings.save_config(config)
         return "Success"
 
     def change_rule(self, rule: ChangeRule):
-        self._data_base.change_rule(rule.id, rule.title, rule.season)
+        self._data_base.update_column(rule)
         return "Success"
 
     @api_failed
@@ -43,7 +43,7 @@ class APIProcess:
     @api_failed
     def add_subscribe(self, link):
         data = self.process_link(link)
-        self._download_client.add_rss_feed(link, data.get("official_title"))
+        self._download_client.add_rss_feed(link, data.official_title)
         self._download_client.set_rule(data, link)
         return data
 
@@ -74,7 +74,5 @@ class APIProcess:
 
 
 if __name__ == '__main__':
-    from conf import DEV_SETTINGS
-    settings.init(DEV_SETTINGS)
     API = APIProcess()
     API.add_subscribe("http://dmhy.org/topics/rss/rss.xml?keyword=彻夜之歌+星空+简")

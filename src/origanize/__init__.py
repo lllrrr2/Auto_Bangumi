@@ -1,2 +1,2 @@
-from .renamer import Renamer
-from .repath import Repath
+from .renamer import RenameTorrent
+from .repath import RepathTorrent
