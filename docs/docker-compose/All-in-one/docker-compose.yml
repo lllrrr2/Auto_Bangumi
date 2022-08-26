@@ -4,7 +4,7 @@ services:
     container_name: qBittorrent
     environment:
       - TZ=Asia/Shanghai
-      - TemPath=/downloads
+      - TempPath=/downloads
       - SavePath=/downloads
       - PGID=${GID}
       - PUID=${UID}

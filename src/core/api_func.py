@@ -10,7 +10,7 @@ from database import DataJson
 from ab_decorator import api_failed
 
 
-class APIProcess:
+class APIFunc:
     def __init__(self):
         self._rss_analyser = RSSAnalyser()
         self._download_client = DownloadClient()
@@ -74,5 +74,5 @@ class APIProcess:
 
 
 if __name__ == '__main__':
-    API = APIProcess()
+    API = APIFunc()
     API.add_subscribe("http://dmhy.org/topics/rss/rss.xml?keyword=彻夜之歌+星空+简")
