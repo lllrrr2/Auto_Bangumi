@@ -1,41 +1,45 @@
 # syntax=docker/dockerfile:1
-FROM python:3.10-buster AS build
 
-RUN mkdir /install
-WORKDIR /install
-COPY requirements.txt .
-RUN python3 -m pip install --upgrade pip \
-    && pip install -r requirements.txt --prefix="/install"
+FROM alpine:3.18
 
-FROM python:3.10-alpine
-
-ENV TZ=Asia/Shanghai \
+ENV LANG="C.UTF-8" \
+    TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=1000 \
     UMASK=022
 
-WORKDIR /src
+WORKDIR /app
 
-COPY --from=build --chmod=777 /install /usr/local
-COPY --chmod=755 ./src /src
+COPY backend/requirements.txt .
+RUN set -ex && \
+    apk add --no-cache \
+        bash \
+        busybox-suid \
+        python3 \
+        py3-aiohttp \
+        py3-bcrypt \
+        py3-pip \
+        su-exec \
+        shadow \
+        tini \
+        openssl \
+        tzdata && \
+    python3 -m pip install --no-cache-dir --upgrade pip && \
+    sed -i '/bcrypt/d' requirements.txt && \
+    pip install --no-cache-dir -r requirements.txt && \
+    # Add user
+    mkdir -p /home/ab && \
+    addgroup -S ab -g 911 && \
+    adduser -S ab -G ab -h /home/ab -s /sbin/nologin -u 911 && \
+    # Clear
+    rm -rf \
+        /root/.cache \
+        /tmp/*
 
-RUN apk add --no-cache \
-    curl \
-    shadow \
-    su-exec \
-    bash
+COPY --chmod=755 backend/src/. .
+COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
-RUN addgroup -S auto_bangumi -g 1000 && \
-    adduser -S auto_bangumi -G auto_bangumi -h /home/auto_bangumi -u 1000 && \
-    usermod -s /bin/bash auto_bangumi && \
-    mkdir -p "/config" && \
-    chmod a+x \
-        run.sh \
-        getWebUI.sh \
-        setID.sh
+ENTRYPOINT ["tini", "-g", "--", "/entrypoint.sh"]
 
 EXPOSE 7892
-
-VOLUME [ "/config" ]
-
-CMD ["sh", "run.sh"]
+VOLUME [ "/app/config" , "/app/data" ]
